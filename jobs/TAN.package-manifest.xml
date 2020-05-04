@@ -3,8 +3,8 @@
 
     <variable name="Root" value="{CWD}"/>
     <variable name="ResourcesDir" value = "{CWD}/Scripts"/>
-    <variable name="InputFilesDir" value = "{CWD}/../Examples"/>
-    <variable name="ResponseFilesDir" value = "{CWD}/../IRs"/>
+    <variable name="AssetsDir" value="{ResPath}"/>
     <variable name="CommonDir" value="{CWD}/../jobs_launcher/common"/>
+    <variable name="BaselineDir" value="{CWD}/../Work/Baseline"/>
     
 </package-manifest>

@@ -1,0 +1,9 @@
+/Results/*
+*.pyc
+*.log
+run_dev.bat
+Baseline/
+Work/
+TAN/
+.idea
+

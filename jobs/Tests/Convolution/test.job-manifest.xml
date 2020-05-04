@@ -1,16 +1,14 @@
 <?xml version="1.0" ?>
 <job-manifest enable="False">
 
-    <execute command='python "{ResourcesDir}/simpleProcess.py"'>
-        <argument>--output_path "{OutputDir}"</argument>
-        <argument>--input_path "{InputFilesDir}"</argument>
-        <argument>--response_path "{ResponseFilesDir}"</argument>
+	<outpath value="{OutputDir}"/>
+  
+    <execute command='python "{ResourcesDir}/simpleRender.py"' timeout="4800">
+        <argument>--tool "{Tool}/TALibTestConvolution"</argument>
+        <argument>--output "{OutputDir}"</argument>
         <argument>--testType Convolution</argument>
-        <argument>--testCases "{TestCases}"</argument>
+        <argument>--res_path "{AssetsDir}"/Convolution</argument>
+        <argument>--test_list "{Root}/Tests/Convolution/test_cases.json"</argument>
     </execute>
-
-<!--     <execute command='python "{ResourcesDir}/makeReport.py"'>
-        <argument>--work_dir "{OutputDir}"</argument>
-    </execute> -->
 
 </job-manifest>

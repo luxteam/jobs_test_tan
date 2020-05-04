@@ -23,12 +23,11 @@ from jobs_launcher.core.kill_process import kill_process
 def createArgsParser():
 	parser = argparse.ArgumentParser()
 
-	parser.add_argument('--output_path', required=True, metavar="<dir>")
-	parser.add_argument('--input_path', required=True, metavar="<dir>")
-	parser.add_argument('--response_path', required=True, metavar="<dir>")
+	parser.add_argument('--tool', required=True, metavar="<dir>")
+	parser.add_argument('--output', required=True, metavar="<dir>")
 	parser.add_argument('--testType', required=True)
-	parser.add_argument('--testCases', required=True)
-	parser.add_argument('--timeout', required=False, default=120)
+	parser.add_argument('--test_list', required=True)
+	parser.add_argument('--res_path', required=False, default=120)
 
 	return parser
 
@@ -36,15 +35,18 @@ def createArgsParser():
 def main(args):
 	args = createArgsParser().parse_args()
 
-	cases = []
+	cases_list = []
 	try:
-        with open(os.path.join(os.path.dirname(sys.argv[0]), args.testCases)) as f:
-            cases_list = json.load(f)
-        main_logger.info("Cases: {}".format([name['case'] for name in cases_list]))
-    except OSError as e:
-        main_logger.error("Failed to read test cases json. ")
-        main_logger.error(str(e))
-        exit(-1)
+		with open(os.path.join(os.path.dirname(sys.argv[0]), args.test_list)) as f:
+			cases_list = json.load(f)
+		core_config.main_logger.info("Cases: {}".format([name['case'] for name in cases_list]))
+	except OSError as e:
+		core_config.main_logger.error("Failed to read test cases json. ")
+		core_config.main_logger.error(str(e))
+		exit(-1)
+
+	core_config.main_logger.info("Cases")
+	core_config.main_logger.info(cases_list)
 
 	core_config.main_logger.info('Create empty report files')
 
@@ -53,7 +55,15 @@ def main(args):
 		core_config.main_logger.error("Can't get gpu name")
 	process_platform = {platform.system(), gpu}
 
-	for case in cases:
+	args.tool = os.path.abspath(args.tool)
+	tool_path = os.path.dirname(args.tool)
+	work_dir = os.path.abspath(args.output)
+	result_path = os.path.join(work_dir, 'Output')
+	if not os.path.exists(result_path):
+		os.makedirs(result_path)
+
+	'''
+	for case in cases_list:
 		if sum([process_platform & set(skip_conf) == set(skip_conf) for skip_conf in case.get('skip_on', '')]):
 			for i in case['skip_on']:
 				skip_on = set(i)
@@ -77,34 +87,28 @@ def main(args):
 
 			with open(os.path.join(work_dir, case['case'] + core_config.CASE_REPORT_SUFFIX), 'w') as f:
 				f.write(json.dumps([template], indent=4))
+	'''
 
 	with open(os.path.join(work_dir, 'test_cases.json'), "w+") as f:
-		json.dump(cases, f, indent=4)
+		json.dump(cases_list, f, indent=4)
 
 	system_pl = platform.system()
 
-	for case in cases:
-		args_list = case["args_list"]
-		cmdRun = case["tool"]
+	for case in cases_list:
+		command_args = case["command_args"]
+		execute_file = case["tool"]
 
-		for arg in args_list.split(' '):
-			arg_type = case["args"]["arg"]["type"]
-			arg_value = arg_type = case["args"]["arg"]["value"]
-			if arg_type == "input_file":
-				arg_value = os.path.join(args.input_path, arg_value)
-			elif arg_type == "output_file":
-				arg_value = os.path.join(args.output_path, arg_value)
-			elif arg_type == "response_file":
-				arg_value = os.path.join(args.response_path, arg_value)
-			cmdRun = cmdRun + " " + arg_value
-
-		cmdRun = cmdRun + "\n"
+		core_config.main_logger.info(command_args)
+		command_args = command_args.format(RES_PATH=args.res_path, OUTPUT=result_path)
+		core_config.main_logger.info(command_args)
 
 		if system_pl == "Windows":
+			cmdRun = "{tool}.exe {command_args}".format(tool=args.tool, command_args=command_args)
 			cmdScriptPath = os.path.join(work_dir, 'script.bat')
 			with open(cmdScriptPath, 'w') as f:
 				f.write(cmdRun)
 		else:
+			cmdRun = "./{tool} {command_args}".format(tool=args.tool, command_args=command_args)
 			cmdScriptPath = os.path.join(work_dir, 'script.sh')
 			with open(cmdScriptPath, 'w') as f:
 				f.write(cmdRun)
@@ -113,30 +117,31 @@ def main(args):
 		core_config.main_logger.info('Launch script on {tool} ({path})'.format(tool=case["tool"], path=cmdScriptPath))
 
 		os.chdir(args.output)
-        p = psutil.Popen(cmdScriptPath, shell=True,
-                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        rc = 1
+		p = psutil.Popen(cmdScriptPath, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		rc = 1
 
-        try:
-            stdout, stderr = p.communicate(timeout=args.timeout)
-        except (psutil.TimeoutExpired, subprocess.TimeoutExpired) as err:
-            main_logger.error("Process has been aborted by timeout")
-            rc = -1
-            for child in reversed(p.children(recursive=True)):
-                child.terminate()
-            p.terminate()
-        finally:
+		try:
+			stdout, stderr = p.communicate(timeout=180)
+		except (psutil.TimeoutExpired, subprocess.TimeoutExpired) as err:
+			core_config.main_logger.error("Process has been aborted by timeout")
+			rc = -1
+			for child in reversed(p.children(recursive=True)):
+				child.terminate()
+			p.terminate()
+		finally:
 
-            with open("process_log.txt", 'a', encoding='utf-8') as file:
-                stdout = stdout.decode("utf-8")
-                file.write(stdout)
+			with open("tool_log.txt", 'a', encoding='utf-8') as file:
+				stdout = stdout.decode("utf-8")
+				file.write(stdout)
 
-            with open("process_log.txt", 'a', encoding='utf-8') as file:
-                file.write("\n ----STEDERR---- \n")
-                stderr = stderr.decode("utf-8")
-                file.write(stderr)
+			with open("tool_log.txt", 'a', encoding='utf-8') as file:
+				file.write("\n ----STEDERR---- \n")
+				stderr = stderr.decode("utf-8")
+				file.write(stderr)
 
 
 if __name__ == "__main__":
+
 	core_config.main_logger.info("simpleProcess start working...")
-	exit(main())
+	args = createArgsParser().parse_args()
+	exit(main(args))
