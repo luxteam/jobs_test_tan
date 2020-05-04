@@ -1,6 +1,10 @@
 <?xml version="1.0" ?>
 <package-manifest name="TAN">
 
-
+    <variable name="Root" value="{CWD}"/>
+    <variable name="ResourcesDir" value = "{CWD}/Scripts"/>
+    <variable name="InputFilesDir" value = "{CWD}/../Examples"/>
+    <variable name="ResponseFilesDir" value = "{CWD}/../IRs"/>
+    <variable name="CommonDir" value="{CWD}/../jobs_launcher/common"/>
     
 </package-manifest>

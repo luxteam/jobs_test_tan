@@ -1,3 +1,26 @@
 [
-
+    {
+        "case": "CONV_001",
+        "status": "active",
+        "tool": "TALibTestConvolution.exe",
+        "args_list": "method in_file out_file response_file}",
+        "args": {
+            "method": {
+                "type": "value",
+                "value": "GPU-OV"
+            },
+            "in_file": {
+                "type": "input_file",
+                "value": "01_Original.wav"
+            },
+            "out_file": {
+                "type": "output_file",
+                "value": "CONV_001.wav"
+            },
+            "response_file": {
+                "type": "response_file",
+                "value": "02_IR_Bedroom_Closet.wav"
+            }
+        }
+    },
 ]

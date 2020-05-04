@@ -1,6 +1,16 @@
 <?xml version="1.0" ?>
 <job-manifest enable="False">
 
+    <execute command='python "{ResourcesDir}/simpleProcess.py"'>
+        <argument>--output_path "{OutputDir}"</argument>
+        <argument>--input_path "{InputFilesDir}"</argument>
+        <argument>--response_path "{ResponseFilesDir}"</argument>
+        <argument>--testType Convolution</argument>
+        <argument>--testCases "{TestCases}"</argument>
+    </execute>
 
+<!--     <execute command='python "{ResourcesDir}/makeReport.py"'>
+        <argument>--work_dir "{OutputDir}"</argument>
+    </execute> -->
 
 </job-manifest>
