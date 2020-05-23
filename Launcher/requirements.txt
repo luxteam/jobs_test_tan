@@ -1,0 +1,4 @@
+pytest
+psutil
+allure-pytest
+soundfile

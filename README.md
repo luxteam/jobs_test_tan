@@ -1,1 +1,1 @@
-# jobs_test_tan
+# Autotests for TAN project

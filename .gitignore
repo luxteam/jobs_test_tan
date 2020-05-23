@@ -1,9 +1,6 @@
-/Results/*
-*.pyc
-*.log
-run_dev.bat
-Baseline/
-Work/
-TAN/
-.idea
-
+allure-report
+__pycache__
+in.wav
+Results
+TAN
+.pytest_cache
