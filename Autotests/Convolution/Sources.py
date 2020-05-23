@@ -1,19 +1,21 @@
 """This file contains autotests for TALibTestConvolution"""
 
-import allure
-import pytest
-import soundfile
-import subprocess
 import os
 import sys
+import ctypes
+import subprocess
+import soundfile
+import pytest
+import allure
+
 
 """VARIABLES"""
-RES_PATH = "C:/TestResources/TAN_Resources/"
+RES_PATH = "C:/TestResources/TanResources/"
 METHODS_LIST = ["CPU-OV", "CPU-NU", "CPU-ON", "GPU-OV", "GPU-NU", "GPU-UN"]
-last_output_name=""
+last_output_name = ""
+
 
 """STEPS"""
-
 @allure.step
 def step_launch_process(command):
     if sys.platform.startswith("win"):
@@ -21,8 +23,6 @@ def step_launch_process(command):
         # See comp.os.ms-windows.programmer.win32
         # How to suppress crash notification dialog?, Jan 14,2004 -
         # Raymond Chen's response [1]
-
-        import ctypes
         SEM_NOGPFAULTERRORBOX = 0x0002 # From MSDN
         ctypes.windll.kernel32.SetErrorMode(SEM_NOGPFAULTERRORBOX);
         subprocess_flags = 0x8000000 #win32con.CREATE_NO_WINDOW?
@@ -32,15 +32,18 @@ def step_launch_process(command):
     last_output_name = command[3]
     return process
 
+
 @allure.step
 def step_check_return_code(process):
     streamdata = process.communicate()[0]
     rc = process.returncode
     assert rc == 0
 
+
 @allure.step
 def step_turn_files_to_array(file, gold_file):
     return soundfile.read(file), soundfile.read(gold_file)
+
 
 @allure.step
 def step_calculate_metrics(data, gold):
