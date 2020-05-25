@@ -14,7 +14,7 @@ from system_info import get_gpu
 if sys.platform.startswith("win"):
     RES_PATH = "C:/TestResources/TanResources/"
 else:
-    RES_PATH = "%home%/JN/TestResources/TanResources/"
+    RES_PATH = "${HOME}/JN/TestResources/TanResources/"
 last_output_name = ""
 
 """STEPS"""
