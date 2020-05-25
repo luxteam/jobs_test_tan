@@ -12,9 +12,9 @@ from system_info import get_gpu
 
 """VARIABLES"""
 if sys.platform.startswith("win"):
-    RES_PATH = "C:/TestResources/TanResources/"
+    RES_PATH = "C:/TestResources/TanAssets/"
 else:
-    RES_PATH = os.getenv("HOME") + "/JN/TestResources/TanResources/"
+    RES_PATH = os.getenv("CIS_TOOLS") + "/JN/TestResources/TanAssets/"
 last_output_name = ""
 
 """STEPS"""
@@ -72,6 +72,7 @@ def step_validate_rmse(rmse):
 def step_validate_correlation(correlation):
     pass
 
+
 """FIXTURES"""
 @pytest.fixture(scope="session")
 def resultsDir():
@@ -80,11 +81,13 @@ def resultsDir():
     yield
     # remove dir? maybe its useful to keep it
 
+
 @pytest.fixture(scope='function')
 def attachOutput():
     yield
     global last_output_name
     allure.attach.file(last_output_name, 'output.wav', extension='wav')
+
 
 """TESTS"""
 @allure.sub_suite("Smoke")
