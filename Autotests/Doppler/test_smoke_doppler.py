@@ -85,6 +85,7 @@ def attachOutput():
 
 """TESTS"""
 @allure.sub_suite("Smoke")
+@allure.suite("Doppler")
 @allure.parent_suite(get_gpu())
 @pytest.mark.usefixtures("resultsDir", "attachOutput")
 class TestSmoke:
