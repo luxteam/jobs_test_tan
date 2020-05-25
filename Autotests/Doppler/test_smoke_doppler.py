@@ -25,7 +25,10 @@ def step_launch_process(command):
         subprocess_flags = 0x8000000
     else:
         subprocess_flags = 0
-    process = subprocess.Popen(command, creationflags=subprocess_flags)
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=subprocess_flags)
+    print(process.communicate()[0].decode('utf-8'))
+    global last_output_name
+    last_output_name = command[3]
     return process
 
 
@@ -66,10 +69,25 @@ def step_validate_rmse(rmse):
 def step_validate_correlation(correlation):
     pass
 
+"""FIXTURES"""
+@pytest.fixture(scope="session")
+def resultsDir():
+    if(not os.path.exists("../Results")):
+        os.mkdir("../Results")
+    yield
+    # remove dir? maybe its useful to keep it
+
+@pytest.fixture(scope='function')
+def attachOutput():
+    yield
+    global last_output_name
+    allure.attach.file(last_output_name, 'output.wav', extension='wav')
 
 """TESTS"""
 @allure.sub_suite("Smoke")
+@allure.suite("Doppler")
 @allure.parent_suite(get_gpu())
+@pytest.mark.usefixtures("resultsDir", "attachOutput")
 class TestSmoke:
     @allure.title("CONV_SM_001")
     @allure.description("""Overlap Add GPU""")
@@ -78,42 +96,39 @@ class TestSmoke:
     @pytest.mark.xfail(condition=lambda: True, reason='Error after outputing file')
     def test_conv_001(self):
         process = step_launch_process(["../TAN/TALibTestConvolution.exe", "GPU-OV", 
-            RES_PATH + "Originals/smokeIn.wav", "../TAN/Results/conv_001.wav", 
+            RES_PATH + "Originals/smokeIn.wav", "../Results/conv_001.wav", 
             RES_PATH + "IRs/testresponse.wav"])
         step_check_return_code(process)
-        data, gold = step_turn_files_to_array("../TAN/Results/conv_001.wav", RES_PATH + "GoldSamples/conv_001.wav")
+        data, gold = step_turn_files_to_array("../Results/conv_001.wav", RES_PATH + "GoldSamples/conv_001.wav")
         rmse, correlation = step_calculate_metrics(data[0], gold[0])
         step_validate_rmse(rmse)
         step_validate_correlation(correlation)
-        allure.attach.file('../TAN/Results/conv_001.wav','output.wav', extension='wav')
         
     @allure.title("CONV_SM_002")
     @allure.description("""Uniform Partitioned GPU""")
     @pytest.mark.timeout(150)
     def test_conv_002(self):
         process = step_launch_process(["../TAN/TALibTestConvolution.exe", "GPU-UN", 
-            RES_PATH + "Originals/smokeIn.wav", "../TAN/Results/conv_002.wav", 
+            RES_PATH + "Originals/smokeIn.wav", "../Results/conv_002.wav", 
             RES_PATH + "IRs/testresponse.wav"])
         step_check_return_code(process)
-        data, gold = step_turn_files_to_array("../TAN/Results/conv_002.wav", RES_PATH + "GoldSamples/conv_001.wav")
+        data, gold = step_turn_files_to_array("../Results/conv_002.wav", RES_PATH + "GoldSamples/conv_001.wav")
         rmse, correlation = step_calculate_metrics(data[0], gold[0])
         step_validate_rmse(rmse)
         step_validate_correlation(correlation)
-        allure.attach.file('../TAN/Results/conv_002.wav','output.wav', extension='wav')
 
     @allure.title("CONV_SM_003")
     @allure.description("""Non-uniform partitioned GPU""")
     @pytest.mark.timeout(150)
     def test_conv_003(self):
         process = step_launch_process(["../TAN/TALibTestConvolution.exe", "GPU-NU", 
-            RES_PATH + "Originals/smokeIn.wav", "../TAN/Results/conv_003.wav", 
+            RES_PATH + "Originals/smokeIn.wav", "../Results/conv_003.wav", 
             RES_PATH + "IRs/testresponse.wav"])
         step_check_return_code(process)
-        data, gold = step_turn_files_to_array("../TAN/Results/conv_003.wav", RES_PATH + "GoldSamples/conv_001.wav")
+        data, gold = step_turn_files_to_array("../Results/conv_003.wav", RES_PATH + "GoldSamples/conv_001.wav")
         rmse, correlation = step_calculate_metrics(data[0], gold[0])
         step_validate_rmse(rmse)
         step_validate_correlation(correlation)
-        allure.attach.file('../TAN/Results/conv_003.wav','output.wav', extension='wav')
 
     @allure.title("CONV_SM_004")
     @allure.description("""Overlap Add CPU""")
@@ -122,14 +137,13 @@ class TestSmoke:
     @pytest.mark.xfail(condition=lambda: True, reason='CPU mode does not work')
     def test_conv_004(self):
         process = step_launch_process(["../TAN/TALibTestConvolution.exe", "CPU-OV", 
-            RES_PATH + "Originals/smokeIn.wav", "../TAN/Results/conv_004.wav", 
+            RES_PATH + "Originals/smokeIn.wav", "../Results/conv_004.wav", 
             RES_PATH + "IRs/testresponse.wav"])
         step_check_return_code(process)
-        data, gold = step_turn_files_to_array("../TAN/Results/conv_004.wav", RES_PATH + "GoldSamples/conv_001.wav")
+        data, gold = step_turn_files_to_array("../Results/conv_004.wav", RES_PATH + "GoldSamples/conv_001.wav")
         rmse, correlation = step_calculate_metrics(data[0], gold[0])
         step_validate_rmse(rmse)
         step_validate_correlation(correlation)
-        allure.attach.file('../TAN/Results/conv_004.wav','output.wav', extension='wav')
 
     @allure.title("CONV_SM_005")
     @allure.description("""Uniform partitioned CPU""")
@@ -138,14 +152,13 @@ class TestSmoke:
     @pytest.mark.xfail(condition=lambda: True, reason='CPU mode does not work')
     def test_conv_005(self):
         process = step_launch_process(["../TAN/TALibTestConvolution.exe", "CPU-UN", 
-            RES_PATH + "Originals/smokeIn.wav", "../TAN/Results/conv_005.wav", 
+            RES_PATH + "Originals/smokeIn.wav", "../Results/conv_005.wav", 
             RES_PATH + "IRs/testresponse.wav"])
         step_check_return_code(process)
-        data, gold = step_turn_files_to_array("../TAN/Results/conv_005.wav", RES_PATH + "GoldSamples/conv_001.wav")
+        data, gold = step_turn_files_to_array("../Results/conv_005.wav", RES_PATH + "GoldSamples/conv_001.wav")
         rmse, correlation = step_calculate_metrics(data[0], gold[0])
         step_validate_rmse(rmse)
         step_validate_correlation(correlation)
-        allure.attach.file('../TAN/Results/conv_005.wav','output.wav', extension='wav')
 
     @allure.title("CONV_SM_006")
     @allure.description("""Non-uniform partitioned CPU""")
@@ -154,18 +167,10 @@ class TestSmoke:
     @pytest.mark.xfail(condition=lambda: True, reason='CPU mode does not work')
     def test_conv_006(self):
         process = step_launch_process(["../TAN/TALibTestConvolution.exe", "CPU-NU", 
-            RES_PATH + "Originals/smokeIn.wav", "../TAN/Results/conv_006.wav", 
+            RES_PATH + "Originals/smokeIn.wav", "../Results/conv_006.wav", 
             RES_PATH + "IRs/testresponse.wav"])
         step_check_return_code(process)
-        data, gold = step_turn_files_to_array("../TAN/Results/conv_006.wav", RES_PATH + "GoldSamples/conv_001.wav")
+        data, gold = step_turn_files_to_array("../Results/conv_006.wav", RES_PATH + "GoldSamples/conv_001.wav")
         rmse, correlation = step_calculate_metrics(data[0], gold[0])
         step_validate_rmse(rmse)
         step_validate_correlation(correlation)
-        allure.attach.file('../TAN/Results/conv_006.wav','output.wav', extension='wav')
-
-
-"""FIXTURES"""
-@pytest.fixture(scope='module')
-def attachOutput():
-    yield
-    allure.attach.file('../TAN/Results/'+last_output_name,'output.wav', extension='wav')

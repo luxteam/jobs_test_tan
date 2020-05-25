@@ -174,24 +174,24 @@ def step_validate_correlation(correlation):
 #     step_validate_correlation(correlation)
 #     allure.attach.file('../../TAN_Resources/Results/src_006.wav','output.wav', extension='wav')
 
-@allure.title("CONV_SM_007")
-@allure.description("""
-Guitar with Boxboro Vintage (Dynamic)
-""")
-@pytest.mark.parametrize('method', METHODS_LIST)
-@pytest.mark.parametrize('input_response_gold', [
-    ("EiroNarethMadworld.wav", "Boxboro Vintage-dynamic.wav", "EiroNarethMadworld.wav")
-])
-def test_src(method, input_response_gold):
-    process = step_launch_process(["../../TAN/TALibTestConvolution.exe", method, 
-    RES_PATH + "Originals/" + input_response_gold[0], "../../TAN/Results/"+input_response_gold[0]+"-"+method, 
-    RES_PATH + "IRs/" + input_response_gold[1]])
-    step_check_return_code(process)
-    data, gold = step_turn_files_to_array("../../TAN/Results/"+input_response_gold[0]+"-"+method, RES_PATH + "GoldSamples/"+input_response_gold[2])
-    rmse, correlation = step_calculate_metrics(data[0], gold[0])
-    step_validate_rmse(rmse)
-    step_validate_correlation(correlation)
-    allure.attach.file('../../TAN/Results/'+input_response_gold[0]+"-"+method,'output.wav', extension='wav')
+# @allure.title("CONV_SM_007")
+# @allure.description("""
+# Guitar with Boxboro Vintage (Dynamic)
+# """)
+# @pytest.mark.parametrize('method', METHODS_LIST)
+# @pytest.mark.parametrize('input_response_gold', [
+#     ("EiroNarethMadworld.wav", "Boxboro Vintage-dynamic.wav", "EiroNarethMadworld.wav")
+# ])
+# def test_src(method, input_response_gold):
+#     process = step_launch_process(["../../TAN/TALibTestConvolution.exe", method, 
+#     RES_PATH + "Originals/" + input_response_gold[0], "../../TAN/Results/"+input_response_gold[0]+"-"+method, 
+#     RES_PATH + "IRs/" + input_response_gold[1]])
+#     step_check_return_code(process)
+#     data, gold = step_turn_files_to_array("../../TAN/Results/"+input_response_gold[0]+"-"+method, RES_PATH + "GoldSamples/"+input_response_gold[2])
+#     rmse, correlation = step_calculate_metrics(data[0], gold[0])
+#     step_validate_rmse(rmse)
+#     step_validate_correlation(correlation)
+#     allure.attach.file('../../TAN/Results/'+input_response_gold[0]+"-"+method,'output.wav', extension='wav')
 
 """FIXTURES"""
 
