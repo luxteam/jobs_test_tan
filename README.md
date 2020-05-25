@@ -13,3 +13,4 @@ Examples of run.bat usage:
 1) .\run.bat Convolution --- runs all test groups from /Autotests/Convolution folder
 2) .\run.bat Convolution/test_smoke_smoke.py --- runs Smoke test group for Convolution
 3) .\run.bat Doppler --- runs all test groups from /Autotests/Doppler folder
+4) .\run.bat FULL --- runs all autotests
