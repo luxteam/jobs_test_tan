@@ -3,3 +3,4 @@ psutil
 py-cpuinfo
 allure-pytest
 soundfile
+pytest-timeout
