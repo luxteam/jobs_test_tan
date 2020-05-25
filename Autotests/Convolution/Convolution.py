@@ -25,7 +25,8 @@ def step_launch_process(command):
         subprocess_flags = 0x8000000
     else:
         subprocess_flags = 0
-    process = subprocess.Popen(command, creationflags=subprocess_flags)
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=subprocess_flags)
+    print(process.communicate()[0].decode('utf-8'))
     global last_output_name
     last_output_name = command[3]
     return process
@@ -80,7 +81,6 @@ def resultsDir():
 def attachOutput():
     yield
     global last_output_name
-    print(last_output_name)
     allure.attach.file(last_output_name, 'output.wav', extension='wav')
 
 """TESTS"""
