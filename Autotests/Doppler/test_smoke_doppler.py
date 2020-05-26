@@ -11,7 +11,7 @@ import allure
 from system_info import get_gpu
 
 """VARIABLES"""
-RES_PATH = "C:/TestResources/TanResources/"
+RES_PATH = "C:\\TestResources\\TanResources\\"
 last_output_name = ""
 
 """STEPS"""
@@ -21,14 +21,14 @@ def step_launch_process(command):
     if sys.platform.startswith("win"):
         # to supress windows errors
         SEM_NOGPFAULTERRORBOX = 0x0002
-        ctypes.windll.kernel32.SetErrorMode(SEM_NOGPFAULTERRORBOX);
+        ctypes.windll.kernel32.SetErrorMode(SEM_NOGPFAULTERRORBOX)
         subprocess_flags = 0x8000000
     else:
         subprocess_flags = 0
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=subprocess_flags)
-    print(process.communicate()[0].decode('utf-8'))
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, creationflags=subprocess_flags)
+    print(process.communicate()[1].decode('utf-8'))
     global last_output_name
-    last_output_name = command[3]
+    last_output_name = command.split()[3]
     return process
 
 
@@ -72,8 +72,8 @@ def step_validate_correlation(correlation):
 """FIXTURES"""
 @pytest.fixture(scope="session")
 def resultsDir():
-    if(not os.path.exists("../Results")):
-        os.mkdir("../Results")
+    if(not os.path.exists("..\\Results")):
+        os.mkdir("..\\Results")
     yield
     # remove dir? maybe its useful to keep it
 
@@ -92,14 +92,13 @@ class TestSmoke:
     @allure.title("DOPP_SM_001")
     @allure.description("""Simple GPU""")
     @pytest.mark.timeout(150)
-    @allure.issue('https://adc.luxoft.com/jira/browse/STVITT-53', 'GPU-OV causes error')
-    @pytest.mark.xfail(condition=lambda: True, reason='Error after outputing file')
+    @allure.issue('https:\\\\adc.luxoft.com\\jira\\browse\\STVITT-77', 'GPU mode doesn\'t work')
+    @pytest.mark.skip
     def test_dopp_001(self):
-        process = step_launch_process(["../TAN/TALibDopplerTest.exe", "GPU-OV", 
-            RES_PATH + "Originals/smokeIn.wav", "../Results/dopp_001.wav", 
-            RES_PATH + "IRs/testresponse.wav"])
+        process = step_launch_process("..\\TAN\\TALibDopplerTest.exe " + RES_PATH + "Rooms\\default.xml " +
+        RES_PATH + "Originals\\smokeIn.wav ..\\Results\\dopp_001.wav 1 GPU")
         step_check_return_code(process)
-        data, gold = step_turn_files_to_array("../Results/dopp_001.wav", RES_PATH + "GoldSamples/dopp_001.wav")
+        data, gold = step_turn_files_to_array("..\\Results\\dopp_001.wav", RES_PATH + "GoldSamples\\dopp_001.wav")
         rmse, correlation = step_calculate_metrics(data[0], gold[0])
         step_validate_rmse(rmse)
         step_validate_correlation(correlation)
@@ -108,24 +107,24 @@ class TestSmoke:
     @allure.description("""Simple CPU""")
     @pytest.mark.timeout(150)
     def test_dopp_002(self):
-        process = step_launch_process(["../TAN/TALibDopplerTest.exe", "GPU-UN", 
-            RES_PATH + "Originals/smokeIn.wav", "../Results/dopp_002.wav", 
-            RES_PATH + "IRs/testresponse.wav"])
+        process = step_launch_process("..\\TAN\\TALibDopplerTest.exe " + RES_PATH + "Rooms\\default.xml " +
+        RES_PATH + "Originals\\smokeIn.wav ..\\Results\\dopp_002.wav 1 CPU")
         step_check_return_code(process)
-        data, gold = step_turn_files_to_array("../Results/dopp_002.wav", RES_PATH + "GoldSamples/dopp_001.wav")
+        data, gold = step_turn_files_to_array("..\\Results\\dopp_002.wav", RES_PATH + "GoldSamples\\dopp_001.wav")
         rmse, correlation = step_calculate_metrics(data[0], gold[0])
         step_validate_rmse(rmse)
         step_validate_correlation(correlation)
 
     @allure.title("DOPP_SM_003")
-    @allure.description(""""Max bounces = 2 GPU"""")
+    @allure.description("""Max bounces = 2 GPU""")
+    @allure.issue('https:\\\\adc.luxoft.com\\jira\\browse\\STVITT-77', 'GPU mode doesn\'t work')
     @pytest.mark.timeout(150)
+    @pytest.mark.skip
     def test_dopp_003(self):
-        process = step_launch_process(["../TAN/TALibDopplerTest.exe", "GPU-NU", 
-            RES_PATH + "Originals/smokeIn.wav", "../Results/dopp_003.wav", 
-            RES_PATH + "IRs/testresponse.wav"])
+        process = step_launch_process("..\\TAN\\TALibDopplerTest.exe " + RES_PATH + "Rooms\\default.xml " +
+        RES_PATH + "Originals\\smokeIn.wav ..\\Results\\dopp_003.wav 2 GPU")
         step_check_return_code(process)
-        data, gold = step_turn_files_to_array("../Results/dopp_003.wav", RES_PATH + "GoldSamples/dopp_003.wav")
+        data, gold = step_turn_files_to_array("..\\Results\\dopp_003.wav", RES_PATH + "GoldSamples\\dopp_003.wav")
         rmse, correlation = step_calculate_metrics(data[0], gold[0])
         step_validate_rmse(rmse)
         step_validate_correlation(correlation)
@@ -133,14 +132,11 @@ class TestSmoke:
     @allure.title("DOPP_SM_004")
     @allure.description("""Max bounces = 2 GPU""")
     @pytest.mark.timeout(150)
-    @allure.issue('https://adc.luxoft.com/jira/browse/STVITT-54', 'CPU modes don\'t work')
-    @pytest.mark.xfail(condition=lambda: True, reason='CPU mode does not work')
     def test_dopp_004(self):
-        process = step_launch_process(["../TAN/TALibDopplerTest.exe", "CPU-OV", 
-            RES_PATH + "Originals/smokeIn.wav", "../Results/dopp_004.wav", 
-            RES_PATH + "IRs/testresponse.wav"])
+        process = step_launch_process("..\\TAN\\TALibDopplerTest.exe " + RES_PATH + "Rooms\\default.xml " +
+        RES_PATH + "Originals\\smokeIn.wav ..\\Results\\dopp_004.wav 2 CPU")
         step_check_return_code(process)
-        data, gold = step_turn_files_to_array("../Results/dopp_004.wav", RES_PATH + "GoldSamples/dopp_003.wav")
+        data, gold = step_turn_files_to_array("..\\Results\\dopp_004.wav", RES_PATH + "GoldSamples\\dopp_003.wav")
         rmse, correlation = step_calculate_metrics(data[0], gold[0])
         step_validate_rmse(rmse)
         step_validate_correlation(correlation)

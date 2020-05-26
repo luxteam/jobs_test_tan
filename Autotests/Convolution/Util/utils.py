@@ -42,6 +42,7 @@ def step_launch_process(command):
         subprocess_flags = 0
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=subprocess_flags)
     print(process.communicate()[0].decode('utf-8'))
+    print(process.communicate()[1].decode('utf-8'))
     global last_output_name
     last_output_name = command[3]
     return process
