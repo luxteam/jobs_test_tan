@@ -84,3 +84,27 @@ def step_validate_rmse(rmse):
 @allure.step
 def step_validate_correlation(correlation):
     pass
+
+
+"""DECORATORS"""
+def decorate_all_tests(decorator):
+    def decorate(cls):
+        for attr in cls.__dict__: # there's propably a better way to do this
+            if callable(getattr(cls, attr)):
+                setattr(cls, attr, decorator(getattr(cls, attr)))
+        return cls
+    return decorate
+
+def status_report(func):
+    def wrapper(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except AssertionError:
+            with open("../allure-results/status.txt", "w") as status_file:
+                status_file.write("F")
+            raise
+        except Exception:
+            with open("../allure-results/status.txt", "w") as status_file:
+                status_file.write("E")
+            raise
+    return wrapper

@@ -16,6 +16,7 @@ from system_info import get_gpu
 @allure.suite("Convolution")
 @allure.parent_suite(get_gpu())
 @pytest.mark.usefixtures("resultsDir", "attachOutput")
+@decorate_all_tests(status_report)
 class TestSmoke:
     @allure.title("CONV_SM_001")
     @allure.description("""Overlap Add GPU""")
