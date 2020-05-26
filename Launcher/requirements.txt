@@ -1,4 +1,4 @@
-pytest
+pytest>=4.5
 psutil
 py-cpuinfo
 allure-pytest
