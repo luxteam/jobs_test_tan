@@ -1,4 +1,4 @@
-"""This file contains autotests for TALibTestConvolution"""
+"""This file contains autotests for Convolution/TALibTestConvolution"""
 
 import os
 import sys
@@ -101,7 +101,7 @@ class TestSmoke:
     @allure.issue('https://adc.luxoft.com/jira/browse/STVITT-53', 'GPU-OV causes error')
     @pytest.mark.xfail(condition=lambda: True, reason='Error after outputing file')
     def test_conv_001(self):
-        process = step_launch_process(["../TAN/TALibTestConvolution.exe", "GPU-OV", 
+        process = step_launch_process(["../TAN/Convolution/TALibTestConvolution.exe", "GPU-OV", 
             RES_PATH + "Originals/smokeIn.wav", "../Results/conv_001.wav", 
             RES_PATH + "IRs/testresponse.wav"])
         step_check_return_code(process)
@@ -114,7 +114,7 @@ class TestSmoke:
     @allure.description("""Uniform Partitioned GPU""")
     @pytest.mark.timeout(150)
     def test_conv_002(self):
-        process = step_launch_process(["../TAN/TALibTestConvolution.exe", "GPU-UN", 
+        process = step_launch_process(["../TAN/Convolution/TALibTestConvolution.exe", "GPU-UN", 
             RES_PATH + "Originals/smokeIn.wav", "../Results/conv_002.wav", 
             RES_PATH + "IRs/testresponse.wav"])
         step_check_return_code(process)
@@ -127,7 +127,7 @@ class TestSmoke:
     @allure.description("""Non-uniform partitioned GPU""")
     @pytest.mark.timeout(150)
     def test_conv_003(self):
-        process = step_launch_process(["../TAN/TALibTestConvolution.exe", "GPU-NU", 
+        process = step_launch_process(["../TAN/Convolution/TALibTestConvolution.exe", "GPU-NU", 
             RES_PATH + "Originals/smokeIn.wav", "../Results/conv_003.wav", 
             RES_PATH + "IRs/testresponse.wav"])
         step_check_return_code(process)
@@ -142,7 +142,7 @@ class TestSmoke:
     @allure.issue('https://adc.luxoft.com/jira/browse/STVITT-54', 'CPU modes don\'t work')
     @pytest.mark.xfail(condition=lambda: True, reason='CPU mode does not work')
     def test_conv_004(self):
-        process = step_launch_process(["../TAN/TALibTestConvolution.exe", "CPU-OV", 
+        process = step_launch_process(["../TAN/Convolution/TALibTestConvolution.exe", "CPU-OV", 
             RES_PATH + "Originals/smokeIn.wav", "../Results/conv_004.wav", 
             RES_PATH + "IRs/testresponse.wav"])
         step_check_return_code(process)
@@ -157,7 +157,7 @@ class TestSmoke:
     @allure.issue('https://adc.luxoft.com/jira/browse/STVITT-54', 'CPU modes don\'t work')
     @pytest.mark.xfail(condition=lambda: True, reason='CPU mode does not work')
     def test_conv_005(self):
-        process = step_launch_process(["../TAN/TALibTestConvolution.exe", "CPU-UN", 
+        process = step_launch_process(["../TAN/Convolution/TALibTestConvolution.exe", "CPU-UN", 
             RES_PATH + "Originals/smokeIn.wav", "../Results/conv_005.wav", 
             RES_PATH + "IRs/testresponse.wav"])
         step_check_return_code(process)
@@ -172,7 +172,7 @@ class TestSmoke:
     @allure.issue('https://adc.luxoft.com/jira/browse/STVITT-54', 'CPU modes don\'t work')
     @pytest.mark.xfail(condition=lambda: True, reason='CPU mode does not work')
     def test_conv_006(self):
-        process = step_launch_process(["../TAN/TALibTestConvolution.exe", "CPU-NU", 
+        process = step_launch_process(["../TAN/Convolution/TALibTestConvolution.exe", "CPU-NU", 
             RES_PATH + "Originals/smokeIn.wav", "../Results/conv_006.wav", 
             RES_PATH + "IRs/testresponse.wav"])
         step_check_return_code(process)
