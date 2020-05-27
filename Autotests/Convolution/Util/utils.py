@@ -29,7 +29,7 @@ def resultsDir():
     time.sleep(3) # wait for last json
     for i in os.listdir("../allure-results"):
         if (i.endswith("-result.json")):
-            newHistoryID = ''.join(random.choices(string.ascii_lowercase + string.digits, k=20))
+            newHistoryID = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20))
             with open("../allure-results/" + i, "r") as res_json:
                 results = json.load(res_json)
                 results["historyId"] = newHistoryID
