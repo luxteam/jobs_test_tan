@@ -9,9 +9,9 @@ import allure
 
 """VARIABLES"""
 if sys.platform.startswith("win"):
-    RES_PATH = "C:/TestResources/TanResources/"
+    RES_PATH = "C:/TestResources/TanAssets/"
 else:
-    RES_PATH = os.getenv("HOME") + "/JN/TestResources/TanResources/"
+    RES_PATH = os.getenv("HOME") + "/JN/TestResources/TanAssets/"
 last_output_name = ""
 
 

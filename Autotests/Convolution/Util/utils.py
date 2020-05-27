@@ -5,13 +5,16 @@ import subprocess
 import soundfile
 import pytest
 import allure
+import random
+import json
+import string
 
 
 """VARIABLES"""
 if sys.platform.startswith("win"):
-    RES_PATH = "C:/TestResources/TanResources/"
+    RES_PATH = "C:/TestResources/TanAssets/"
 else:
-    RES_PATH = os.getenv("HOME") + "/JN/TestResources/TanResources/"
+    RES_PATH = os.getenv("HOME") + "/JN/TestResources/TanAssets/"
 last_output_name = ""
 
 
@@ -21,6 +24,15 @@ def resultsDir():
     if(not os.path.exists("../Results")):
         os.mkdir("../Results")
     yield
+    # replacing history ID with a random one
+    for i in os.listdir("../allure-results"):
+        if (i.endswith("-result.json")):
+            newHistoryID = ''.join(random.choices(string.ascii_lowercase + string.digits, k=20))
+            with open("../allure-results/" + i, "r") as res_json:
+                results = json.load(res_json)
+                results["historyId"] = newHistoryID
+            with open("../allure-results/" + i, "w") as res_json:
+                json.dump(results, res_json)
     # remove dir? maybe its useful to keep it
 
 @pytest.fixture(scope='function')
