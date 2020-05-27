@@ -1,5 +1,6 @@
 pytest
 psutil
+numpy
 py-cpuinfo
 allure-pytest
 soundfile
