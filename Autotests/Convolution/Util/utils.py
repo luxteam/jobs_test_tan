@@ -8,6 +8,7 @@ import allure
 import random
 import json
 import string
+import time
 
 
 """VARIABLES"""
@@ -25,6 +26,7 @@ def resultsDir():
         os.mkdir("../Results")
     yield
     # replacing history ID with a random one
+    time.sleep(3) # wait for last json
     for i in os.listdir("../allure-results"):
         if (i.endswith("-result.json")):
             newHistoryID = ''.join(random.choices(string.ascii_lowercase + string.digits, k=20))
