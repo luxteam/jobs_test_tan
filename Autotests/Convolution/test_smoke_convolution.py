@@ -13,7 +13,7 @@ from system_info import get_gpu
 
 """TESTS"""
 
-@allure.parent_suite(get_gpu()+" Finally new")
+@allure.parent_suite(get_gpu())
 @allure.suite("Convolution")
 @allure.sub_suite("Smoke")
 @pytest.mark.usefixtures("resultsDir", "attachOutput")
@@ -36,7 +36,6 @@ class TestSmoke:
     @allure.title("CONV_SM_002")
     @allure.description("""Uniform Partitioned GPU""")
     @pytest.mark.timeout(150)
-    @pytest.mark.skip
     def test_conve_002(self):
         process = step_launch_process(["../TAN/TALibTestConvolution.exe", "GPU-UN", 
             RES_PATH + "Originals/smokeIn.wav", "../Results/conv_002.wav", 
@@ -50,7 +49,6 @@ class TestSmoke:
     @allure.title("CONV_SM_003")
     @allure.description("""Non-uniform partitioned GPU""")
     @pytest.mark.timeout(150)
-    @pytest.mark.skip
     def test_conve_003(self):
         process = step_launch_process(["../TAN/TALibTestConvolution.exe", "GPU-NU", 
             RES_PATH + "Originals/smokeIn.wav", "../Results/conv_003.wav", 
