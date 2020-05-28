@@ -7,13 +7,14 @@ import subprocess
 import soundfile
 import pytest
 import allure
+import platform
 
 from Util.utils import *
 from system_info import get_gpu
 
 """TESTS"""
 
-@allure.parent_suite(get_gpu())
+@allure.parent_suite(get_gpu() + " " + platform.system() + " " + platform.release())
 @allure.suite("Convolution")
 @allure.sub_suite("Smoke")
 @pytest.mark.usefixtures("resultsDir", "attachOutput")
