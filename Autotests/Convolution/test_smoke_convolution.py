@@ -10,7 +10,7 @@ import allure
 import platform
 
 from Util.utils import *
-from system_info import get_gpu
+from Util.system_info import get_gpu
 
 """TESTS"""
 
