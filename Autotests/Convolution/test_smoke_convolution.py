@@ -14,8 +14,8 @@ from Util.system_info import get_gpu
 
 """TESTS"""
 
-@allure.parent_suite(get_gpu() + " " + platform.system() + " " + platform.release())
-@allure.suite("Convolution")
+@allure.parent_suite("Convolution")
+@allure.suite(get_gpu() + " " + platform.system() + " " + platform.release())
 @allure.sub_suite("Smoke")
 @pytest.mark.usefixtures("resultsDir", "attachOutput")
 class TestSmoke:

@@ -13,9 +13,10 @@ from Util.utils import *
 from Util.system_info import get_gpu
 
 """TESTS"""
+
+@allure.parent_suite("Doppler")
+@allure.suite(get_gpu() + " " + platform.system() + " " + platform.release())
 @allure.sub_suite("Smoke")
-@allure.suite("Doppler")
-@allure.parent_suite(get_gpu() + " " + platform.system() + " " + platform.release())
 @pytest.mark.usefixtures("resultsDir", "attachOutput")
 class TestSmoke:
     @allure.title("DOPP_SM_001")
