@@ -8,6 +8,8 @@ import allure
 import random
 import json
 import string
+import operator
+import functools
 
 
 """VARIABLES"""
@@ -17,7 +19,7 @@ else:
     RES_PATH = os.getenv("HOME") + "/JN/TestResources/TanAssets/"
 last_output_name = ""
 last_gold_name = ""
-
+foldl = lambda func, acc, xs: functools.reduce(func, xs, acc)
 
 """FIXTURES"""
 @pytest.fixture(scope="session")
@@ -95,6 +97,21 @@ def runConvolution(method, input, output, IR, gold):
     process = step_launch_process(["../TAN/cmake-TALibTestConvolution-bin/TALibTestConvolution.exe", method, 
     RES_PATH + "Originals/" + input, "../Results/" + output, 
     RES_PATH + "IRs-48000/" + IR])
+    step_check_return_code(process)
+    data, gold = step_turn_files_to_array("../Results/" + output, RES_PATH + "GoldSamples/" + gold)
+    rmse, correlation = step_calculate_metrics(data[0], gold[0])
+    step_validate_rmse(rmse)
+    step_validate_correlation(correlation)
+
+def runConvolutionMulti(method, input, output, gold, *IRs):
+    global last_gold_name, last_output_name
+    last_gold_name = RES_PATH + "GoldSamples/" + gold
+    last_output_name = "../Results/" + output
+    command = ["../TAN/cmake-TALibTestConvolution-bin/TALibTestConvolution.exe", method, 
+    RES_PATH + "Originals/" + input, "../Results/" + output]
+    for i in IRs:
+        command.append(RES_PATH + "IRs-48000/" + i)
+    process = step_launch_process(command)
     step_check_return_code(process)
     data, gold = step_turn_files_to_array("../Results/" + output, RES_PATH + "GoldSamples/" + gold)
     rmse, correlation = step_calculate_metrics(data[0], gold[0])
