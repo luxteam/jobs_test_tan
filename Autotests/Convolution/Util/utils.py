@@ -117,3 +117,16 @@ def runConvolutionMulti(method, input, output, gold, *IRs):
     rmse, correlation = step_calculate_metrics(data[0], gold[0])
     step_validate_rmse(rmse)
     step_validate_correlation(correlation)
+
+def runDoppler(room, input, output, reflections, device, gold):
+    global last_gold_name, last_output_name
+    last_gold_name = RES_PATH + "GoldSamples/" + gold
+    last_output_name = "../Results/" + output
+    process = step_launch_process(["..\\TAN\\cmake-TALibDopplerTest-bin\\TALibDopplerTest.exe", 
+    RES_PATH + "Rooms\\" + room, RES_PATH + "Originals\\" + input, 
+    "..\\Results\\" + output, reflections, device])
+    step_check_return_code(process)
+    data, gold = step_turn_files_to_array("..\\Results\\" + output, RES_PATH + "GoldSamples\\" + gold)
+    rmse, correlation = step_calculate_metrics(data[0], gold[0])
+    step_validate_rmse(rmse)
+    step_validate_correlation(correlation)
