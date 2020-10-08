@@ -5,11 +5,6 @@ import subprocess
 import soundfile
 import pytest
 import allure
-import random
-import json
-import string
-import operator
-import functools
 
 
 """VARIABLES"""
@@ -19,24 +14,6 @@ else:
     RES_PATH = os.getenv("HOME") + "/JN/TestResources/TanAssets/"
 last_output_name = ""
 last_gold_name = ""
-last_input_name = ""
-foldl = lambda func, acc, xs: functools.reduce(func, xs, acc)
-
-"""FIXTURES"""
-@pytest.fixture(scope="session")
-def resultsDir():
-    if(not os.path.exists("../Results")):
-        os.mkdir("../Results")
-    yield
-
-@pytest.fixture(scope='function')
-def attachOutput():
-    global last_output_name, last_gold_name
-    yield
-    allure.attach.file(last_output_name, last_output_name.split("/")[-1], extension='wav')
-    allure.attach.file(last_gold_name, 'gold.wav', extension='wav')
-    allure.attach.file(last_input_name, 'input.wav', extension='wav')
-
 
 """STEPS"""
 @allure.step
@@ -89,12 +66,26 @@ def step_validate_rmse(rmse):
 
 @allure.step
 def step_validate_correlation(correlation):
-    assert correlation >= 0.75
+    pass
+
+"""FIXTURES"""
+@pytest.fixture(scope="session")
+def resultsDir():
+    if(not os.path.exists("..\\Results")):
+        os.mkdir("..\\Results")
+    yield
+    # remove dir? maybe its useful to keep it
+
+@pytest.fixture(scope='function')
+def attachOutput():
+    global last_output_name, last_gold_name
+    yield
+    allure.attach.file(last_output_name, 'output.wav', extension='wav')
+    allure.attach.file(last_gold_name, 'gold.wav', extension='wav')
 
 """FUNCTIONS"""
 def runConvolution(method, input, output, IR, gold):
-    global last_gold_name, last_output_name, last_input_name
-    last_input_name = RES_PATH + "Originals/" + input
+    global last_gold_name, last_output_name
     last_gold_name = RES_PATH + "GoldSamples/" + gold
     last_output_name = "../Results/" + output
     process = step_launch_process(["../TAN/cmake-TALibTestConvolution-bin/TALibTestConvolution.exe", method, 
@@ -107,8 +98,7 @@ def runConvolution(method, input, output, IR, gold):
     step_validate_correlation(correlation)
 
 def runConvolutionMulti(method, input, output, gold, *IRs):
-    global last_gold_name, last_output_name, last_input_name
-    last_input_name = RES_PATH + "Originals/" + input
+    global last_gold_name, last_output_name
     last_gold_name = RES_PATH + "GoldSamples/" + gold
     last_output_name = "../Results/" + output
     command = ["../TAN/cmake-TALibTestConvolution-bin/TALibTestConvolution.exe", method, 
@@ -123,10 +113,9 @@ def runConvolutionMulti(method, input, output, gold, *IRs):
     step_validate_correlation(correlation)
 
 def runDoppler(room, input, output, reflections, device, gold):
-    global last_gold_name, last_output_name, last_input_name
+    global last_gold_name, last_output_name
     last_gold_name = RES_PATH + "GoldSamples/" + gold
     last_output_name = "../Results/" + output
-    last_input_name = RES_PATH + "Originals\\" + input
     process = step_launch_process(["..\\TAN\\cmake-TALibDopplerTest-bin\\TALibDopplerTest.exe", 
     RES_PATH + "Rooms\\" + room, RES_PATH + "Originals\\" + input, 
     "..\\Results\\" + output, reflections, device])

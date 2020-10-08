@@ -1,0 +1,16 @@
+[
+    {
+      "name": "Correlation validation failed",
+      "traceRegex": ".*> 0.95",
+      "matchedStatuses": ["failed" ]
+    },
+    {
+      "name": "Autotests issue",
+      "matchedStatuses": ["broken"]
+    },
+    {
+      "name": "Invalid return code",
+      "traceRegex": ".*== 0",
+      "matchedStatuses": ["failed"]
+    }
+]
