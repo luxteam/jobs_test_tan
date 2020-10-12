@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 import ctypes
 import subprocess
 import soundfile
@@ -37,6 +38,13 @@ def step_check_return_code(process):
     rc = process.returncode
     assert rc == 0
 
+@allure.step
+def step_move_results(output, config_name):
+    if not os.path.exists('../Results/'):
+        os.makedirs('../Results/')
+    shutil.move("../TAN/cmake-RoomAcousticQT-bin/RoomAcousticsRun.wav", "../Results/" + output)
+    shutil.move("../TAN/cmake-RoomAcousticQT-bin/" + config_name + ".log", "../Results/" + config_name + ".log")
+    pass
 
 @allure.step
 def step_turn_files_to_array(file, gold_file):
@@ -46,8 +54,11 @@ def step_turn_files_to_array(file, gold_file):
 @allure.step
 def step_calculate_metrics(data, gold):
     x, y, xy, xx, yy, sq_diff = (0,0,0,0,0,0)
-    n = len(data)
+    n = 0
     for i, j in zip(data, gold):
+        if (n >= 1000000):
+            break
+        n += 1
         x += i[0]; x += i[1]
         y += j[0]; y += j[1]
         xy += i[0]*j[0]; xy += i[1]*j[1]
@@ -71,8 +82,8 @@ def step_validate_correlation(correlation):
 """FIXTURES"""
 @pytest.fixture(scope="session")
 def resultsDir():
-    if(not os.path.exists("..\\Results")):
-        os.mkdir("..\\Results")
+    if(not os.path.exists("../Results")):
+        os.mkdir("../Results")
     yield
     # remove dir? maybe its useful to keep it
 
@@ -84,43 +95,17 @@ def attachOutput():
     allure.attach.file(last_gold_name, 'gold.wav', extension='wav')
 
 """FUNCTIONS"""
-def runConvolution(method, input, output, IR, gold):
+def runRoomAcoustic(config_name, gold, output):
     global last_gold_name, last_output_name
     last_gold_name = RES_PATH + "GoldSamples/" + gold
     last_output_name = "../Results/" + output
-    process = step_launch_process(["../TAN/cmake-TALibTestConvolution-bin/TALibTestConvolution.exe", method, 
-    RES_PATH + "Originals/" + input, "../Results/" + output, 
-    RES_PATH + "IRs-48000/" + IR])
+    process = step_launch_process(["../TAN/cmake-RoomAcousticQT-bin/RoomAcousticsQT.exe", 
+    "--configFile", RES_PATH + "Configurations/" + config_name,
+    "--metricsFile", config_name + ".log"
+    ])
     step_check_return_code(process)
+    step_move_results(output, config_name)
     data, gold = step_turn_files_to_array("../Results/" + output, RES_PATH + "GoldSamples/" + gold)
-    rmse, correlation = step_calculate_metrics(data[0], gold[0])
-    step_validate_rmse(rmse)
-    step_validate_correlation(correlation)
-
-def runConvolutionMulti(method, input, output, gold, *IRs):
-    global last_gold_name, last_output_name
-    last_gold_name = RES_PATH + "GoldSamples/" + gold
-    last_output_name = "../Results/" + output
-    command = ["../TAN/cmake-TALibTestConvolution-bin/TALibTestConvolution.exe", method, 
-    RES_PATH + "Originals/" + input, "../Results/" + output]
-    for i in IRs:
-        command.append(RES_PATH + "IRs-48000/" + i)
-    process = step_launch_process(command)
-    step_check_return_code(process)
-    data, gold = step_turn_files_to_array("../Results/" + output, RES_PATH + "GoldSamples/" + gold)
-    rmse, correlation = step_calculate_metrics(data[0], gold[0])
-    step_validate_rmse(rmse)
-    step_validate_correlation(correlation)
-
-def runDoppler(room, input, output, reflections, device, gold):
-    global last_gold_name, last_output_name
-    last_gold_name = RES_PATH + "GoldSamples/" + gold
-    last_output_name = "../Results/" + output
-    process = step_launch_process(["..\\TAN\\cmake-TALibDopplerTest-bin\\TALibDopplerTest.exe", 
-    RES_PATH + "Rooms\\" + room, RES_PATH + "Originals\\" + input, 
-    "..\\Results\\" + output, reflections, device])
-    step_check_return_code(process)
-    data, gold = step_turn_files_to_array("..\\Results\\" + output, RES_PATH + "GoldSamples\\" + gold)
     rmse, correlation = step_calculate_metrics(data[0], gold[0])
     step_validate_rmse(rmse)
     step_validate_correlation(correlation)
